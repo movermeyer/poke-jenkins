@@ -176,9 +176,9 @@ def test_poke_jenkins_hook_with_auth(
             mock.call(
                 'http://example.ci.com/job/unit/buildWithParameters?TAG={tag}&NODE_ID={node_id}&{repo_url}'
                 .format(repo_url=urllib.urlencode(dict(REPO_URL=repo_url)), node_id=node_id, tag=tag), '',
-                {'Authorization': 'QmFzaWM6IGZvbzpiYXI='}),
+                {'Authorization': 'Basic: Zm9vOmJhcg=='}),
             mock.call(
                 'http://example.ci.com/job/functional/buildWithParameters?TAG={tag}&NODE_ID={node_id}&'
                 '{repo_url}'.format(repo_url=urllib.urlencode(dict(REPO_URL=repo_url)), node_id=node_id, tag=tag), '',
-                {'Authorization': 'QmFzaWM6IGZvbzpiYXI='}),
+                {'Authorization': 'Basic: Zm9vOmJhcg=='}),
         ), any_order=True)
