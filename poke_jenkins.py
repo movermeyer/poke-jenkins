@@ -1,6 +1,7 @@
 """A simple extension that fires a Jenkins job for incoming heads."""
 from contextlib import closing
 from urllib import urlencode
+import re
 import urllib2
 import urlparse
 
@@ -46,7 +47,9 @@ def poke_jenkins_hook(ui, repo, node, **kwargs):
     tag = ui.config('poke_jenkins', 'tag', default='', untrusted=False)
     username = ui.config('poke_jenkins', 'username', default='', untrusted=False)
     password = ui.config('poke_jenkins', 'password', default='', untrusted=False)
-
+    branch_regex = ui.config('poke_jenkins', 'branch_regex', default=None, untrusted=False)
+    if branch_regex:
+        branch_regex = re.compile(branch_regex)
     branches = {}
 
     # Collect the incoming heads that don't have any children.
@@ -66,15 +69,16 @@ def poke_jenkins_hook(ui, repo, node, **kwargs):
 
     # For every head start a Jenkins job.
     for branch, rev in sorted(branches.items()):
-        for job in jobs:
-            base = urlparse.urljoin(jenkins_base_url, BUILD_URL.format(job=job))
-            args = urlencode([('TAG', tag), ('NODE_ID', rev), ('REPO_URL', repo_url)])
+        if branch_regex is None or branch_regex.match(branch):
+            for job in jobs:
+                base = urlparse.urljoin(jenkins_base_url, BUILD_URL.format(job=job))
+                args = urlencode([('TAG', tag), ('NODE_ID', rev), ('REPO_URL', repo_url), ('BRANCH', branch)])
 
-            url = '?'.join([base, args])
+                url = '?'.join([base, args])
 
-            request = urllib2.Request(url, '', headers)
+                request = urllib2.Request(url, '', headers)
 
-            with closing(urllib2.urlopen(request, timeout=timeout)) as f:
-                ui.write('Starting the job {job} for the branch: {branch}, revision: {rev}\n'.format(
-                    job=job, branch=branch, rev=rev))
-                f.read()
+                with closing(urllib2.urlopen(request, timeout=timeout)) as f:
+                    ui.write('Starting the job {job} for the branch: {branch}, revision: {rev}\n'.format(
+                        job=job, branch=branch, rev=rev))
+                    f.read()

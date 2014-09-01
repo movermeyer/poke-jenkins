@@ -31,7 +31,7 @@ for text_file in ['README.rst', 'CHANGES.rst']:
 
 setup(
     name='poke-jenkins',
-    version='1.0.2',
+    version='1.1.0',
     description='Mercurial extension to start new Jenkins jobs.',
     long_description='\n'.join(long_description),
     author='Paylogic International',
