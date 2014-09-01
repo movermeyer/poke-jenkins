@@ -1,11 +1,13 @@
+"""Packaging entry point."""
 from os.path import abspath, dirname, join
 
-from setuptools import setup, find_packages
+from setuptools import setup
 from setuptools.command.test import test as TestCommand
 import sys
 
 
 class ToxTestCommand(TestCommand):
+
     """Test command which runs tox under the hood."""
 
     def finalize_options(self):
@@ -29,14 +31,15 @@ for text_file in ['README.rst', 'CHANGES.rst']:
 
 setup(
     name='poke-jenkins',
-    version='1.0.0',
+    version='1.0.1',
     description='Mercurial extension to start new Jenkins jobs.',
     long_description='\n'.join(long_description),
     author='Paylogic International',
     author_email='developers@paylogic.com',
+    url='https://github.com/paylogic/poke-jenkins',
     license='MIT',
     install_requires=['mercurial'],
-    packages=find_packages(exclude=['ez_setup']),
+    py_modules=['poke_jenkins'],
     tests_require=['detox'],
     cmdclass={'test': ToxTestCommand},
     keywords='mercurial hg scm jenkins',
