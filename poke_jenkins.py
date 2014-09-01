@@ -12,6 +12,7 @@ BUILD_URL = 'job/{job}/buildWithParameters'
 
 def reposetup(ui, repo):
     """Set up the Jenkins notification hook.
+
     :param ui: Mercurial ui object
     :param repo: Mercurial repository object
     """
@@ -20,11 +21,11 @@ def reposetup(ui, repo):
 
 def poke_jenkins_hook(ui, repo, node, **kwargs):
     """Filter out the incoming heads and start a Jenkins job for them.
+
     :param ui: Mercurial ui object
     :param repo: Mercurial repository object
     :param node: Mercurial node object (eg commit)
     """
-
     jenkins_base_url = ui.config('poke_jenkins', 'jenkins_base_url', default=None, untrusted=False)
     if not jenkins_base_url:
         raise util.Abort(
@@ -43,6 +44,8 @@ def poke_jenkins_hook(ui, repo, node, **kwargs):
 
     jobs = ui.configlist('poke_jenkins', 'jobs', default=[], untrusted=False)
     tag = ui.config('poke_jenkins', 'tag', default='', untrusted=False)
+    username = ui.config('poke_jenkins', 'username', default='', untrusted=False)
+    password = ui.config('poke_jenkins', 'password', default='', untrusted=False)
 
     branches = {}
 
@@ -53,6 +56,14 @@ def poke_jenkins_hook(ui, repo, node, **kwargs):
         if not any(ctx.children()):
             branches[branch] = ctx.hex()
 
+    if username and password:
+        headers = {
+            'Authorization':
+            'Basic: {0}'.format('{0}:{1}'.format(username, password)).encode('base64').replace('\n', '')
+        }
+    else:
+        headers = {}
+
     # For every head start a Jenkins job.
     for branch, rev in sorted(branches.items()):
         for job in jobs:
@@ -61,7 +72,9 @@ def poke_jenkins_hook(ui, repo, node, **kwargs):
 
             url = '?'.join([base, args])
 
-            with closing(urllib2.urlopen(url, timeout=timeout)) as f:
+            request = urllib2.Request(url, '', headers)
+
+            with closing(urllib2.urlopen(request, timeout=timeout)) as f:
                 ui.write('Starting the job {job} for the branch: {branch}, revision: {rev}\n'.format(
                     job=job, branch=branch, rev=rev))
                 f.read()

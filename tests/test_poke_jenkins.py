@@ -51,9 +51,29 @@ def jenkins_jobs():
 
 
 @pytest.fixture
+def jenkins_username():
+    """Get test jenkins username."""
+    return 'foo'
+
+
+@pytest.fixture
+def jenkins_password():
+    """Get test jenkins password."""
+    return 'bar'
+
+
+@pytest.fixture
 def hg_ui_with_jenkins_jobs(hg_ui, jenkins_jobs):
-    """Get test mercurial ui with jenkins jobs  config set up."""
+    """Get test mercurial ui with jenkins jobs config set up."""
     hg_ui.setconfig('poke_jenkins', 'jobs', jenkins_jobs)
+    return hg_ui
+
+
+@pytest.fixture
+def hg_ui_with_jenkins_auth(hg_ui, jenkins_username, jenkins_password):
+    """Get test mercurial ui with jenkins auth config set up."""
+    hg_ui.setconfig('poke_jenkins', 'username', jenkins_username)
+    hg_ui.setconfig('poke_jenkins', 'password', jenkins_password)
     return hg_ui
 
 
@@ -111,7 +131,6 @@ def test_poke_jenkins(hg_ui, hg_repo):
 
 def test_poke_jenkins_hook_no_jenkins_base_url(hg_ui, hg_repo, hg_node):
     """Test poke_jenkins hook without url being set up."""
-
     with pytest.raises(util.Abort) as exc:
         # should raise an exception to set up the jenkins base url
         poke_jenkins.poke_jenkins_hook(hg_ui, hg_repo, hg_node)
@@ -132,15 +151,34 @@ def test_poke_jenkins_hook(
         hg_ui_with_repo_url, hg_ui_with_jenkins_base_url, hg_ui_with_jenkins_jobs, hg_ui_with_tag, hg_repo,
         hg_node, repo_url, tag):
     """Test poke_jenkins hook with jenkins base url and repo url and jenkins jobs being set up."""
-    with mock.patch('urllib2.urlopen') as mocked:
+    with mock.patch.multiple('urllib2', urlopen=mock.DEFAULT, Request=mock.DEFAULT) as mocks:
         poke_jenkins.poke_jenkins_hook(hg_ui_with_jenkins_jobs, hg_repo, hg_node)
         node_id = hg_repo[hg_node].hex()
-        mocked.assert_has_calls((
+        mocks['Request'].assert_has_calls((
             mock.call(
                 'http://example.ci.com/job/unit/buildWithParameters?TAG={tag}&NODE_ID={node_id}&{repo_url}'
-                .format(repo_url=urllib.urlencode(dict(REPO_URL=repo_url)), node_id=node_id, tag=tag), timeout=10),
+                .format(repo_url=urllib.urlencode(dict(REPO_URL=repo_url)), node_id=node_id, tag=tag), '', {}),
             mock.call(
                 'http://example.ci.com/job/functional/buildWithParameters?TAG={tag}&NODE_ID={node_id}&'
                 '{repo_url}'.format(repo_url=urllib.urlencode(dict(REPO_URL=repo_url)), node_id=node_id, tag=tag),
-                timeout=10),
+                '', {}),
+        ), any_order=True)
+
+
+def test_poke_jenkins_hook_with_auth(
+        hg_ui_with_repo_url, hg_ui_with_jenkins_base_url, hg_ui_with_jenkins_jobs, hg_ui_with_jenkins_auth,
+        hg_ui_with_tag, hg_repo, hg_node, repo_url, tag):
+    """Test poke_jenkins hook with jenkins base url and repo url and jenkins jobs being set up and with auth enabled."""
+    with mock.patch.multiple('urllib2', urlopen=mock.DEFAULT, Request=mock.DEFAULT) as mocks:
+        poke_jenkins.poke_jenkins_hook(hg_ui_with_jenkins_jobs, hg_repo, hg_node)
+        node_id = hg_repo[hg_node].hex()
+        mocks['Request'].assert_has_calls((
+            mock.call(
+                'http://example.ci.com/job/unit/buildWithParameters?TAG={tag}&NODE_ID={node_id}&{repo_url}'
+                .format(repo_url=urllib.urlencode(dict(REPO_URL=repo_url)), node_id=node_id, tag=tag), '',
+                {'Authorization': 'QmFzaWM6IGZvbzpiYXI='}),
+            mock.call(
+                'http://example.ci.com/job/functional/buildWithParameters?TAG={tag}&NODE_ID={node_id}&'
+                '{repo_url}'.format(repo_url=urllib.urlencode(dict(REPO_URL=repo_url)), node_id=node_id, tag=tag), '',
+                {'Authorization': 'QmFzaWM6IGZvbzpiYXI='}),
         ), any_order=True)

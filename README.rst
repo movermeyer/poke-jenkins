@@ -30,16 +30,27 @@ An example of .hg/hgrc of your remote repository:
     poke_jenkins =
 
     [poke_jenkins]
+
     # Jenkins url
     jenkins_base_url = http://ci.example.com
+
     # List the jobs you want to start
     jobs = Project_Tests_Dev Project_Coverage_Dev
+
     # Feel free to change this parameter
     tag = foo
+
     # The url which Jenkins will use to clone the repository
     repo_url = ssh://code.example.com//example
-    # Timeout is seconds
+
+    # Timeout in seconds
     timeout = 10
+
+    # Jenkins user id
+    username = foo
+
+    # Jenkins API Token
+    password = bar
 
 
 Python3 support
