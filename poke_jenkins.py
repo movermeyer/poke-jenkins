@@ -62,7 +62,7 @@ def poke_jenkins_hook(ui, repo, node, **kwargs):
     if username and password:
         headers = {
             'Authorization':
-            'Basic: {0}'.format('{0}:{1}'.format(username, password).encode('base64').replace('\n', ''))
+            'Basic {0}'.format('{0}:{1}'.format(username, password).encode('base64').replace('\n', ''))
         }
     else:
         headers = {}

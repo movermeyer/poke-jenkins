@@ -190,13 +190,13 @@ def test_poke_jenkins_hook_with_auth(
                 '&BRANCH={branch}'.format(
                     repo_url=urllib.urlencode(dict(REPO_URL=repo_url)),
                     node_id=node_id, tag=tag, branch='default'), '',
-                {'Authorization': 'Basic: Zm9vOmJhcg=='}),
+                {'Authorization': 'Basic Zm9vOmJhcg=='}),
             mock.call(
                 'http://example.ci.com/job/functional/buildWithParameters?TAG={tag}&NODE_ID={node_id}&'
                 '{repo_url}&BRANCH={branch}'.format(
                     repo_url=urllib.urlencode(dict(REPO_URL=repo_url)),
                     node_id=node_id, tag=tag, branch='default'), '',
-                {'Authorization': 'Basic: Zm9vOmJhcg=='}),
+                {'Authorization': 'Basic Zm9vOmJhcg=='}),
         ), any_order=True)
 
 

@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.1.1
+-----
+
+* Fixed basic auth header value (bubenkoff)
+
 
 1.1.0
 -----
