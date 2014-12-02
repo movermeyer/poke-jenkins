@@ -14,7 +14,7 @@ The ``poke-jenkins`` is a Mercurial extension that for the heads of an incoming 
 Installation
 ------------
 
-.. sourcecode::
+.. sourcecode:: sh
 
     pip install poke-jenkins
 
