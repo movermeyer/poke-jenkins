@@ -61,9 +61,9 @@ Usage
 
 With given configuration above, it will call jenkins jobs to start builds:
 
-* http://ci.example.com/job/Project_Tests_Dev?TAG=foo&NODE_ID=<mercurial commit hash>&BRANCH=<branch name>&REPO_URL=ssh://code.example.com//example
+* ``http://ci.example.com/job/Project_Tests_Dev?TAG=foo&NODE_ID=<mercurial commit hash>&BRANCH=<branch name>&REPO_URL=ssh://code.example.com//example``
 
-* http://ci.example.com/job/Project_Coverage_Dev?TAG=foo&NODE_ID=<mercurial commit hash>&BRANCH=<branch name>&REPO_URL=ssh://code.example.com//example
+* ``http://ci.example.com/job/Project_Coverage_Dev?TAG=foo&NODE_ID=<mercurial commit hash>&BRANCH=<branch name>&REPO_URL=ssh://code.example.com//example``
 
 It will add basic auth headers to authenticate the calls if username and password settings are set.
 
