@@ -5,7 +5,7 @@ The ``poke-jenkins`` is a Mercurial extension that for the heads of an incoming 
 
 .. image:: https://api.travis-ci.org/paylogic/poke-jenkins.png
    :target: https://travis-ci.org/paylogic/poke-jenkins
-.. image:: https://pypip.in/v/poke-jenkins/badge.png
+.. image:: https://img.shields.io/pypi/v/poke-jenkins.svg
    :target: https://crate.io/packages/poke-jenkins/
 .. image:: https://coveralls.io/repos/paylogic/poke-jenkins/badge.png?branch=master
    :target: https://coveralls.io/r/paylogic/poke-jenkins
